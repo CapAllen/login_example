@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html>
+
+
+<head>
+    <title>Login Page</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='bootstrap.min.css') }}">
+    <script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
+</head>
+
+<body>
+    <form action="{{ url_for('login') }}" method="POST">
+        <p>
+            手机号:<br>
+            <input type="text" name="phone" /><br>
+        </p>
+        <p>
+            验证码:</br>
+            <input type="text" name="password" /><br>
+        </p>
+        {{ form.csrf_token }}
+        <p><input type="submit" value="登陆"></p>
+    </form>
+</body>
+
+</html>
