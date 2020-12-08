@@ -13,57 +13,110 @@
 
 <body>
     <div class="container">
-        <form method="post" action="{{url_for('login')}}" class="form-horizontal" role="form" id="myForm" onsubmit="return ">
-            <!-- Modal -->
-            <div class="modal fade" id="elegantModalForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <!--Content-->
-                    <div class="modal-content form-elegant">
-                        <!--Header-->
-                        <div class="modal-header text-center">
-                            <h3 class="modal-title w-100 dark-grey-text font-weight-bold my-3" id="myModalLabel"><strong>Sign in</strong></h3>
+        <form>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+            点击登录
+          </button>
+            <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">登录</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                         </div>
-                        <!--Body-->
-                        <div class="modal-body mx-4">
-                            <!--Body-->
-                            <div class="md-form mb-5">
-                                <input type="email" id="Form-email1" class="form-control validate">
-                                <label data-error="wrong" data-success="right" for="Form-email1">Your email</label>
+                        <div class="modal-body">
+                            <div class="col-md-6 mb-3">
+                                <input type="text" class="form-control" placeholder="手机号" name="user_phone" id="mobile" required>
+                                <span id="checkPhone" style="color: brown;"></span>
                             </div>
+                            <div class="col-md-8 mb-3" style="display: flex;">
 
-                            <div class="md-form pb-3">
-                                <input type="password" id="Form-pass1" class="form-control validate">
-                                <label data-error="wrong" data-success="right" for="Form-pass1">Your password</label>
+                                <input type="text" class="form-control col-md-4" placeholder="验证码" name="verify_code" id="code" required>
+                                <button type="button" class="btn-sm btn-success col-md-4 ml-3" id="verify">获取验证码</button>
 
-                            </div>
-
-                            <div class="text-center mb-3">
-                                <button type="submit" class="btn blue-gradient btn-block btn-rounded z-depth-1a">Sign in</button>
-                            </div>
-                            <p class="font-small dark-grey-text text-right d-flex justify-content-center mb-3 pt-2"> or Sign in with:
-                            </p>
-
-                            <div class="row my-3 d-flex justify-content-center">
-                                <!--Wechat-->
-                                <button type="button" class="btn btn-white btn-rounded mr-md-3 z-depth-1a"><i class="fa fa-weixin" aria-hidden="true"></i> </button>
 
                             </div>
+                            <div class="col-md-6 mb-3" id="checkCode" style="color: brown;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" id="submit" disabled>登录</button>
                         </div>
                     </div>
-                    <!--/.Content-->
                 </div>
-            </div>
-            <!-- Modal -->
-
-            <div class="text-center">
-                <a href="" class="btn btn-default btn-rounded" data-toggle="modal" data-target="#elegantModalForm">Launch
-  modal Login Form</a>
             </div>
         </form>
     </div>
 </body>
+
+<script>
+    $('#verify').click(function() {
+
+        var $phone = $('#mobile').val(); //获取输入的电话号
+        var reg_phone = /1\d{10}/;
+        if (!reg_phone.test($phone)) { //验证手机是否符合格式
+            $('#checkPhone').text("手机号输入有误");
+            return false;
+        };
+        // 输入正确的手机号之后
+        $('#checkPhone').text("");
+        $('#checkCode').text("");
+        $('#submit').removeClass("btn-secondary");
+        $('#submit').addClass("btn-primary");
+        $('#submit').removeProp("disabled");
+
+
+        var n = parseInt(Math.random() * 10000) + 1000; //生成随机验证码，位数自己制定
+
+        $(this).prop("disabled", true); //点击获取验证码后，禁用该按钮，开始倒计时
+        $(this).removeClass("btn-success");
+        $(this).addClass("btn-secondary");
+
+        var time = 3; //倒计时时间，自定义
+        var $this = $(this); //备份，定时器是异步的，此this非彼this
+        var timer = setInterval(function() {
+            time--; //开始倒计时
+            if (time == 0) { //当倒计时为0秒时，关闭定时器，更改按钮显示文本并设置为可以点击
+                clearInterval(timer);
+                $this.text('获取验证码');
+                $this.removeClass("btn-secondary");
+                $this.addClass("btn-success");
+                $this.removeProp("disabled");
+                return;
+            }
+            $this.text('还剩' + time + "S"); //显示剩余秒数
+
+
+        }, 1000); //定时器一秒走一次，每次减一，就是倒计时了
+
+
+
+        $.ajax({
+            type: "GET",
+            url: "/" + $phone + "/get_code"
+        })
+    });
+    // 验证验证码
+    $('#submit').click(function() {
+        $.ajax({
+            type: "GET",
+            url: "/" + $('#mobile').val() + "/" + $('#code').val() + "/" + "check_code",
+            success: function(data) {
+                if (data.result) {
+                    window.location.href = "/login";
+                } else {
+                    $('#checkCode').text("验证码输入有误");
+                    return false;
+                }
+
+            }
+        });
+
+
+
+
+    });
+</script>
 
 </html>
