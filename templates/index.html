@@ -10,10 +10,11 @@
     <script src="{{ url_for('static',filename='jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='bootstrap.min.js') }}"></script>
 </head>
+{% block body %}
 
 <body>
     <div class="container">
-        <form>
+        <form method="POST">
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
             点击登录
           </button>
@@ -38,10 +39,16 @@
 
 
                             </div>
-                            <div class="col-md-6 mb-3" id="checkCode" style="color: brown;"></div>
+                            <div class="col-md-6 mb-3" id="checkCode" style="color: brown;">{% with messages = get_flashed_messages() %} {% if messages %}
+                                <ul>
+                                    {% for message in messages %}
+                                    <li><strong>{{message}}</strong></li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %} {% endwith %}</div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" id="submit" disabled>登录</button>
+                            <button type="submit" class="btn btn-secondary" id="submit" disabled>登录</button>
                         </div>
                     </div>
                 </div>
@@ -98,25 +105,30 @@
         })
     });
     // 验证验证码
-    $('#submit').click(function() {
-        $.ajax({
-            type: "GET",
-            url: "/" + $('#mobile').val() + "/" + $('#code').val() + "/" + "check_code",
-            success: function(data) {
-                if (data.result) {
-                    window.location.href = "/login";
-                } else {
-                    $('#checkCode').text("验证码输入有误");
-                    return false;
-                }
-
-            }
-        });
-
+    // $('#submit').click(function() {
+    //     $('#checkCode').text("");
+    //     $.ajax({
+    //         type: "GET",
+    //         url: "/" + $('#mobile').val() + "/" + $('#code').val() + "/" + "check_code"
+    //             // success: function(data) {
+    //             //     if (!data.result) {
+    //             //         $('#checkCode').text("验证码输入有误");
+    //             //         return false;
+    //             //     }
+    //             // else {
+    //             //     window.location.href = "/login";
+    //             // }
 
 
 
-    });
+    //         // }
+    //     });
+
+
+
+
+    // });
 </script>
+{% endblock %}
 
 </html>
